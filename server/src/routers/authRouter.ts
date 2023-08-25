@@ -10,15 +10,22 @@ import {
 	create,
 	generateForgetPasswordLink,
 	granValid,
+	logOut,
+	sendProfile,
 	sendReverifyEmail,
 	signIn,
 	updatePassword,
+	updateProfile,
 	verifyEmail
 } from "../controllers/user";
 import { isValidPassResetToken, mustAuth } from "../middleware/auth";
 import { JwtPayload, verify } from "jsonwebtoken";
 import { JWT_SECRET } from "../utils/variables";
 import User from "../models/user";
+import formidable from "formidable";
+import path from "path";
+import fs from "fs";
+import fileParser from "../middleware/fileParser";
 
 const router = Router();
 
@@ -39,20 +46,9 @@ router.post(
 	updatePassword
 );
 router.post("/sign-in", validate(SignInValidationSchema), signIn);
-router.post("/is-auth", mustAuth, (req, res) => {
-	res.json({
-		profile: req.user
-	});
-});
-router.post("/public", (req, res) => {
-	res.json({
-		message: "You are in public route"
-	});
-});
-router.post("/private", mustAuth, (req, res) => {
-	res.json({
-		message: "You are in private route"
-	});
-});
+router.post("/is-auth", mustAuth, sendProfile);
+router.post("/update-profile", mustAuth, fileParser, updateProfile);
+router.post("/log-out", mustAuth, logOut);
+
 
 export default router;
