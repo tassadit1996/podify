@@ -13,3 +13,18 @@ export interface verifyUser extends Request {
 		token: string;
 	};
 }
+declare global {
+	namespace Express {
+		interface Request {
+			user: {
+				id: any;
+				email: string;
+				name: string;
+				verified: boolean;
+				avatar?: string;
+				followers: number;
+				followings: number;
+			};
+		}
+	}
+}

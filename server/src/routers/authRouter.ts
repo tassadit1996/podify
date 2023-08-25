@@ -1,8 +1,7 @@
 import { Router } from "express";
-import User from "../models/user";
-import { createUser } from "../@types/user";
 import {
 	CreateUserSchema,
+	SignInValidationSchema,
 	TokenAndIdValidation,
 	UpdatePasswordSchema
 } from "../utils/validationSchema";
@@ -12,10 +11,14 @@ import {
 	generateForgetPasswordLink,
 	granValid,
 	sendReverifyEmail,
+	signIn,
 	updatePassword,
 	verifyEmail
 } from "../controllers/user";
-import { isValidPassResetToken } from "../middleware/auth";
+import { isValidPassResetToken, mustAuth } from "../middleware/auth";
+import { JwtPayload, verify } from "jsonwebtoken";
+import { JWT_SECRET } from "../utils/variables";
+import User from "../models/user";
 
 const router = Router();
 
@@ -35,5 +38,21 @@ router.post(
 	isValidPassResetToken,
 	updatePassword
 );
+router.post("/sign-in", validate(SignInValidationSchema), signIn);
+router.post("/is-auth", mustAuth, (req, res) => {
+	res.json({
+		profile: req.user
+	});
+});
+router.post("/public", (req, res) => {
+	res.json({
+		message: "You are in public route"
+	});
+});
+router.post("/private", mustAuth, (req, res) => {
+	res.json({
+		message: "You are in private route"
+	});
+});
 
 export default router;
