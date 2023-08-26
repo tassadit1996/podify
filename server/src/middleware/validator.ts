@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import * as yup from "yup";
 export const validate = (schema: any): RequestHandler => {
 	return async (req, res, next) => {
+
 		if (!req.body)
 			return res
 				.status(422)
