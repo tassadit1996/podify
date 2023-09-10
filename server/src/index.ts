@@ -6,6 +6,8 @@ import audioRouter from "#/routers/audioRouter";
 import favoriteRouter from "#/routers/favoriteRouter";
 import playlistRouter from "#/routers/playlistRouter";
 import profileRouter from "#/routers/profileRouter";
+import historyRouter from "./routers/history";
+
 
 
 
@@ -20,6 +22,8 @@ app.use("/audio", audioRouter);
 app.use("/favorite", favoriteRouter);
 app.use("/playlist", playlistRouter);
 app.use("/profile", profileRouter);
+app.use("/history", historyRouter);
+
 
 
 
