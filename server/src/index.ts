@@ -7,6 +7,7 @@ import favoriteRouter from "#/routers/favoriteRouter";
 import playlistRouter from "#/routers/playlistRouter";
 import profileRouter from "#/routers/profileRouter";
 import historyRouter from "./routers/history";
+import "./utils/schedule";
 
 
 

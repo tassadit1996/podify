@@ -4,6 +4,7 @@ import formidable from "formidable";
 import cloudinary from "../cloud";
 import { categoriesTypes } from "../utils/audio_category";
 import Audio from "../models/audio";
+import { PopulateFavList } from "../@types/audio";
 interface CreateAudioRequest extends RequestWithFiles {
     body: {
         title: string, about: string, category: categoriesTypes
@@ -15,8 +16,8 @@ export const createAudio: RequestHandler = async (req: CreateAudioRequest, res) 
     const category = req.body.category[0]
 
 
-    const poster = req.files?.poster[0] as formidable.File
-    const audioFile = req.files?.file[0] as formidable.File
+    const poster = req.files?.poster![0] as formidable.File
+    const audioFile = req.files?.file![0] as formidable.File
     const ownerId = req.user.id
     if (!audioFile) return res.status(422).json({ error: "Audio file is missing" })
     const audioRes = await cloudinary.uploader.upload(audioFile.filepath, {
@@ -46,7 +47,7 @@ export const updateAudio: RequestHandler = async (req: CreateAudioRequest, res) 
     const about = req.body.about[0]
     const category = req.body.category[0]
     const { audioId } = req.params
-    const poster = req.files?.poster[0] as formidable.File
+    const poster = req.files?.poster![0] as formidable.File
     const ownerId = req.user.id
     const audio = await Audio.findOneAndUpdate({ owner: ownerId, _id: audioId }, { title, about, category }, { new: true })
     if (!audio) return res.status(403).json({ error: "Audio not found" })
@@ -68,3 +69,23 @@ export const updateAudio: RequestHandler = async (req: CreateAudioRequest, res) 
     res.status(201).json({ audio: { title, about, file: audio.file.url, poster: audio.poster?.url } })
 
 }
+export const getLatestUploads: RequestHandler = async (req, res) => {
+    const list = await Audio.find()
+        .sort("-createdAt")
+        .limit(10)
+        .populate<PopulateFavList>("owner");
+
+    const audios = list.map((item) => {
+        return {
+            id: item._id,
+            title: item.title,
+            about: item.about,
+            category: item.category,
+            file: item.file.url,
+            poster: item.poster?.url,
+            owner: { name: item.owner.name, id: item.owner._id },
+        };
+    });
+
+    res.json({ audios });
+};

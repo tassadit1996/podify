@@ -49,6 +49,7 @@ export const sendReverifyEmail: RequestHandler = async (req, res) => {
 		return res.status(403).json({ error: "invalid user !" });
 	const user = await User.findById(id);
 	if (!user) return res.status(403).json({ error: "invalid request !" });
+	if (user.verified) return res.status(403).json({ error: "your account is already verified" });
 	const token = generateToken();
 	await EmailVerificationToken.findOneAndDelete({ owner: id });
 
@@ -119,7 +120,7 @@ export const updateProfile: RequestHandler = async (
 
 
 	const { name } = req.body;
-	const avatar = req.files?.avatar[0];
+	const avatar = req.files?.avatar![0];
 	const user = await User.findById(req.user.id);
 	if (!user) throw new Error("something went wrong, user not found!");
 
