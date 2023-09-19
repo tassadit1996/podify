@@ -16,11 +16,12 @@ import { JWT_SECRET, PASSWORD_RESET_LINK } from "../utils/variables";
 import jwt from "jsonwebtoken";
 import { RequestWithFiles } from "../middleware/fileParser";
 import cloudinary from "../cloud";
-import { error } from "console";
-import formidable from "formidable";
+
 
 export const create: RequestHandler = async (req: createUser, res) => {
 	const { email, password, name } = req.body;
+	const oldUser = await User.findOne({ email })
+	if (oldUser) return res.status(403).json({ error: "your email is already used" });
 	const user = await User.create({ email, password, name });
 	const token = generateToken();
 	await EmailVerificationToken.create({

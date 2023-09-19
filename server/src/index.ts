@@ -1,5 +1,6 @@
 import express from "express";
 import "dotenv/config";
+import "express-async-errors"
 import "#/db";
 import authRouter from "#/routers/authRouter";
 import audioRouter from "#/routers/audioRouter";
@@ -8,6 +9,7 @@ import playlistRouter from "#/routers/playlistRouter";
 import profileRouter from "#/routers/profileRouter";
 import historyRouter from "./routers/history";
 import "./utils/schedule";
+import { errorHandler } from "#/middleware/error";
 
 
 
@@ -24,6 +26,8 @@ app.use("/favorite", favoriteRouter);
 app.use("/playlist", playlistRouter);
 app.use("/profile", profileRouter);
 app.use("/history", historyRouter);
+app.use(errorHandler);
+
 
 
 

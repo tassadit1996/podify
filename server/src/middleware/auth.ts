@@ -75,6 +75,6 @@ export const isAuth: RequestHandler = async (req, res, next) => {
 	next();
 };
 export const isVerified: RequestHandler = (req, res, next) => {
-	if (req.user.verified) return res.status(403).json({ error: 'account not verified' })
+	if (!req.user.verified) return res.status(403).json({ error: 'account not verified' })
 	next()
 }

@@ -15,34 +15,53 @@ export const createAudio: RequestHandler = async (req: CreateAudioRequest, res) 
     const about = req.body.about[0]
     const category = req.body.category[0]
 
+    console.log(req.body);
 
-    const poster = req.files?.poster![0] as formidable.File
-    const audioFile = req.files?.file![0] as formidable.File
-    const ownerId = req.user.id
-    if (!audioFile) return res.status(422).json({ error: "Audio file is missing" })
+    const poster = req.files?.poster[0] as formidable.File;
+    const audioFile = req.files?.file[0] as formidable.File;
+    const ownerId = req.user.id;
+
+    if (!audioFile)
+        return res.status(422).json({ error: "Audio file is missing!" });
+
     const audioRes = await cloudinary.uploader.upload(audioFile.filepath, {
-        resource_type: 'video'
-    })
+        resource_type: "video",
+    });
     const newAudio = new Audio({
-        title, about, category, owner: ownerId,
-        file: { url: audioRes.secure_url, publicId: audioRes.public_id }
-    })
+        title,
+        about,
+        category,
+        owner: ownerId,
+        file: { url: audioRes.url, publicId: audioRes.public_id },
+    });
+
     if (poster) {
         const posterRes = await cloudinary.uploader.upload(poster.filepath, {
             width: 300,
             height: 300,
             crop: "thumb",
-            gravity: "face"
-        })
-        newAudio.poster = { url: posterRes.secure_url, publicId: posterRes.public_id }
+            gravity: "face",
+        });
+
+        newAudio.poster = {
+            url: posterRes.secure_url,
+            publicId: posterRes.public_id,
+        };
     }
-    await newAudio.save()
-    res.status(201).json({ audio: { title, about, file: newAudio.file.url, poster: newAudio.poster?.url } })
+
+    await newAudio.save();
+
+    res.status(201).json({
+        audio: {
+            title,
+            about,
+            file: newAudio.file.url,
+            poster: newAudio.poster?.url,
+        },
+    });
 
 }
 export const updateAudio: RequestHandler = async (req: CreateAudioRequest, res) => {
-    console.log(req.body, req.params);
-
     const title = req.body.title[0]
     const about = req.body.about[0]
     const category = req.body.category[0]
